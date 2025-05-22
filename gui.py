@@ -5,13 +5,29 @@ from task_manager import add_task, list_tasks, delete_task, toggle_task
 
 def refresh_listbox():
     keyword = search_var.get().lower()
+    sort_method = sort_var.get()
+    
+    all_tasks = list_tasks()
+
+    # Filter by search
+    filtered = [t for t in all_tasks if keyword in t["description"].lower()]
+
+    # Sort logic
+    if sort_method == "Priority":
+        priority_order = {"High": 0, "Medium": 1, "Low": 2}
+        filtered.sort(key=lambda t: priority_order.get(t["priority"], 3))
+    elif sort_method == "Due Date":
+        filtered.sort(key=lambda t: t["due_date"] or "9999-99-99")
+    elif sort_method == "Completion":
+        filtered.sort(key=lambda t: t["completed"])
+
     task_listbox.delete(0, tk.END)
-    for i, task in enumerate(list_tasks()):
-        if keyword in task["description"].lower():
-            status = "✅" if task["completed"] else "❌"
-            due = task["due_date"] or "None"
-            display = f"{i+1}. {task['description']} [Priority: {task['priority']}, Due: {due}] {status}"
-            task_listbox.insert(tk.END, display)
+    for i, task in enumerate(filtered):
+        status = "✅" if task["completed"] else "❌"
+        due = task["due_date"] or "None"
+        display = f"{i+1}. {task['description']} [Priority: {task['priority']}, Due: {due}] {status}"
+        task_listbox.insert(tk.END, display)
+
 
 
 def handle_add():
@@ -113,6 +129,28 @@ search_entry.configure(bg="#1e1e2f", fg="#FFFFFF", insertbackground="#FFFFFF")
 
 
 search_var.trace_add("write", lambda *args: refresh_listbox())
+
+sort_container = tk.Frame(search_frame, bg="#1e1e2f")
+sort_container.pack(side=tk.RIGHT, padx=5)
+
+sort_var = tk.StringVar(value="None")
+
+sort_label = tk.Label(search_frame, text="Sort:", bg="#1e1e2f", fg="white")
+sort_label.pack(side=tk.LEFT, padx=(0, 5))
+
+sort_menu = tk.OptionMenu(
+    search_frame,
+    sort_var,
+    "None",        
+    "Priority",
+    "Due Date",
+    "Completion"
+)
+sort_menu.configure(width=12, font=("Segoe UI", 10), highlightthickness=0, bd=0, bg="#333", fg="white")
+sort_menu.pack(side=tk.LEFT, padx=5)
+
+sort_var.trace_add("write", lambda *args: refresh_listbox())
+
 
 
 # task list
