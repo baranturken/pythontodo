@@ -4,12 +4,15 @@ from task_manager import add_task, list_tasks, delete_task, toggle_task
 
 
 def refresh_listbox():
+    keyword = search_var.get().lower()
     task_listbox.delete(0, tk.END)
     for i, task in enumerate(list_tasks()):
-        status = "✅" if task["completed"] else "❌"
-        due = task["due_date"] or "None"
-        display = f"{i+1}. {task['description']} [Priority: {task['priority']}, Due: {due}] {status}"
-        task_listbox.insert(tk.END, display)
+        if keyword in task["description"].lower():
+            status = "✅" if task["completed"] else "❌"
+            due = task["due_date"] or "None"
+            display = f"{i+1}. {task['description']} [Priority: {task['priority']}, Due: {due}] {status}"
+            task_listbox.insert(tk.END, display)
+
 
 def handle_add():
     desc = task_entry.get().strip()
@@ -70,7 +73,12 @@ def update_priority_color(*args):
 input_frame = tk.Frame(root, bg="#1e1e2f")
 input_frame.pack(pady=10, fill=tk.X)
 
+
 task_entry = tk.Entry(input_frame, width=40)
+
+task_label = tk.Label(input_frame, text="Task Name:", bg="#1e1e2f", fg="white")
+task_label.pack(side=tk.LEFT, padx=(0, 5))
+
 task_entry.pack(side=tk.LEFT, padx=5)
 task_entry.configure(bg="#1e1e2f", fg="#FFFFFF", insertbackground="#1e1e2f")
 
@@ -89,6 +97,23 @@ due_entry.configure(bg="#1e1e2f", fg="#FFFFFF", insertbackground="#1e1e2f")
 
 add_btn = tk.Button(input_frame, text="Add Task", bg="#4CAF50", fg="white", command=handle_add)
 add_btn.pack(side=tk.LEFT, padx=5)
+
+search_var = tk.StringVar()
+
+search_frame = tk.Frame(root, bg="#1e1e2f")
+search_frame.pack(pady=(0, 5), fill=tk.X)
+
+
+search_label = tk.Label(search_frame, text="Search:", bg="#1e1e2f", fg="white")
+search_label.pack(side=tk.LEFT, padx=(0, 5))
+
+search_entry = tk.Entry(search_frame, textvariable=search_var, width=40)
+search_entry.pack(side=tk.LEFT, padx=5)
+search_entry.configure(bg="#1e1e2f", fg="#FFFFFF", insertbackground="#FFFFFF")
+
+
+search_var.trace_add("write", lambda *args: refresh_listbox())
+
 
 # task list
 task_listbox = tk.Listbox(root, width=100, height=12, font=("Segoe UI", 10), bg="#2c2c3c", fg="white", selectbackground="#444", selectforeground="white")
