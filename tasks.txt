@@ -1,0 +1,4 @@
+{"description": "change the task list color", "completed": true, "priority": "Medium", "due_date": "2025-05-23"}
+{"description": "change the background color", "completed": true, "priority": "Medium", "due_date": "YYYY-MM-DD"}
+{"description": "Submit the project", "completed": false, "priority": "High", "due_date": "2025-05-26"}
+{"description": "restart the computer", "completed": false, "priority": "Low", "due_date": null}

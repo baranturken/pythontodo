@@ -1,0 +1,108 @@
+import tkinter as tk
+from tkinter import messagebox
+from task_manager import add_task, list_tasks, delete_task, toggle_task
+
+
+def refresh_listbox():
+    task_listbox.delete(0, tk.END)
+    for i, task in enumerate(list_tasks()):
+        status = "✅" if task["completed"] else "❌"
+        due = task["due_date"] or "None"
+        display = f"{i+1}. {task['description']} [Priority: {task['priority']}, Due: {due}] {status}"
+        task_listbox.insert(tk.END, display)
+
+def handle_add():
+    desc = task_entry.get().strip()
+    if not desc:
+        messagebox.showerror("Error", "Task description cannot be empty.")
+        return
+    priority = priority_var.get()
+    due = due_entry.get().strip() or None
+    if add_task(desc, priority, due):
+        refresh_listbox()
+        task_entry.delete(0, tk.END)
+        due_entry.delete(0, tk.END)
+
+def handle_delete():
+    selection = task_listbox.curselection()
+    if not selection:
+        messagebox.showinfo("Info", "No task selected.")
+        return
+    index = selection[0]
+    delete_task(index)
+    refresh_listbox()
+
+def handle_toggle():
+    selection = task_listbox.curselection()
+    if not selection:
+        messagebox.showinfo("Info", "No task selected.")
+        return
+    index = selection[0]
+    toggle_task(index)
+    refresh_listbox()
+
+
+
+
+root = tk.Tk()
+root.title("To-Do List")
+root.geometry("800x420")
+root.configure(bg="#1e1e2f", padx=10, pady=10)
+input_frame = tk.Frame(root, bg="#1e1e2f")
+btn_frame = tk.Frame(root, bg="#1e1e2f")
+
+
+priority_var = tk.StringVar(value="Medium")
+
+def update_priority_color(*args):
+    val = priority_var.get()
+    if val == "Low":
+        priority_menu.configure(bg="#4CAF50", fg="white")  # Green
+    elif val == "Medium":
+        priority_menu.configure(bg="#2196F3", fg="white")  # Blue
+    elif val == "High":
+        priority_menu.configure(bg="#f44336", fg="white")  # Red
+
+
+
+
+# Input Frame
+input_frame = tk.Frame(root, bg="#1e1e2f")
+input_frame.pack(pady=10, fill=tk.X)
+
+task_entry = tk.Entry(input_frame, width=40)
+task_entry.pack(side=tk.LEFT, padx=5)
+task_entry.configure(bg="#1e1e2f", fg="#FFFFFF", insertbackground="#1e1e2f")
+
+priority_menu = tk.OptionMenu(input_frame, priority_var, "Low", "Medium", "High")
+priority_menu.configure(width=8, font=("Segoe UI", 10), highlightthickness=0, bd=0)
+priority_menu.pack(side=tk.LEFT, padx=5)
+
+priority_var.trace_add("write", update_priority_color)
+update_priority_color()
+
+due_entry = tk.Entry(input_frame, width=15)
+due_entry.insert(0, "YYYY-MM-DD")
+due_entry.pack(side=tk.LEFT, padx=5)
+due_entry.configure(bg="#1e1e2f", fg="#FFFFFF", insertbackground="#1e1e2f")
+
+
+add_btn = tk.Button(input_frame, text="Add Task", bg="#4CAF50", fg="white", command=handle_add)
+add_btn.pack(side=tk.LEFT, padx=5)
+
+# task list
+task_listbox = tk.Listbox(root, width=100, height=12, font=("Segoe UI", 10), bg="#2c2c3c", fg="white", selectbackground="#444", selectforeground="white")
+task_listbox.pack(pady=10)
+
+# buttons frame
+btn_frame = tk.Frame(root, bg="#1e1e2f")
+btn_frame.pack(pady=5)
+
+toggle_btn = tk.Button(btn_frame, text="Toggle Status", bg="#2196F3", fg="white", width=20, command=handle_toggle)
+toggle_btn.pack(side=tk.LEFT, padx=10)
+
+delete_btn = tk.Button(btn_frame, text="Delete Task", bg="#f44336", fg="white", width=20, command=handle_delete)
+delete_btn.pack(side=tk.LEFT, padx=10)
+
+refresh_listbox()
+root.mainloop()
