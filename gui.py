@@ -2,11 +2,16 @@ import tkinter as tk
 from tkinter import messagebox
 from task_manager import add_task, list_tasks, delete_task, toggle_task
 from task_manager import mark_all_complete  # we'll add this function next
+from task_manager import clear_completed_tasks  # Add this at the top if not already
+
 
 def handle_mark_all_complete():
     mark_all_complete()
     refresh_listbox()
 
+def handle_clear_completed():
+    clear_completed_tasks()
+    refresh_listbox()
 
 def refresh_listbox():
     keyword = search_var.get().lower()
@@ -174,6 +179,9 @@ delete_btn.pack(side=tk.LEFT, padx=10)
 
 mark_all_btn = tk.Button(btn_frame, text="Mark All Complete", bg="#9C27B0", fg="white", width=20, command=handle_mark_all_complete)
 mark_all_btn.pack(side=tk.LEFT, padx=10)
+
+clear_btn = tk.Button(btn_frame, text="Clear Completed", bg="#FF9800", fg="white", width=20, command=handle_clear_completed)
+clear_btn.pack(side=tk.LEFT, padx=10)
 
 
 refresh_listbox()

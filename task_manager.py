@@ -45,3 +45,8 @@ def mark_all_complete():
     for task in tasks:
         task["completed"] = True
     save_tasks(tasks)
+
+def clear_completed_tasks():
+    global tasks
+    tasks = [t for t in tasks if not t["completed"]]
+    save_tasks(tasks)
