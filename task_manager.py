@@ -40,3 +40,8 @@ def toggle_task(index):
         save_tasks(tasks)
         return True
     return False
+
+def mark_all_complete():
+    for task in tasks:
+        task["completed"] = True
+    save_tasks(tasks)

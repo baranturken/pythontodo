@@ -1,6 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
 from task_manager import add_task, list_tasks, delete_task, toggle_task
+from task_manager import mark_all_complete  # we'll add this function next
+
+def handle_mark_all_complete():
+    mark_all_complete()
+    refresh_listbox()
 
 
 def refresh_listbox():
@@ -166,6 +171,10 @@ toggle_btn.pack(side=tk.LEFT, padx=10)
 
 delete_btn = tk.Button(btn_frame, text="Delete Task", bg="#f44336", fg="white", width=20, command=handle_delete)
 delete_btn.pack(side=tk.LEFT, padx=10)
+
+mark_all_btn = tk.Button(btn_frame, text="Mark All Complete", bg="#9C27B0", fg="white", width=20, command=handle_mark_all_complete)
+mark_all_btn.pack(side=tk.LEFT, padx=10)
+
 
 refresh_listbox()
 root.mainloop()
