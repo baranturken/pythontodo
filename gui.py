@@ -3,7 +3,9 @@ from tkinter import messagebox
 from task_manager import add_task, list_tasks, delete_task, toggle_task
 from task_manager import mark_all_complete  # we'll add this function next
 from task_manager import clear_completed_tasks  # Add this at the top if not already
+from datetime import datetime
 
+visible_tasks = []
 
 def handle_mark_all_complete():
     mark_all_complete()
@@ -20,23 +22,44 @@ def refresh_listbox():
     all_tasks = list_tasks()
 
     # Filter by search
-    filtered = [t for t in all_tasks if keyword in t["description"].lower()]
+    global visible_tasks
+    visible_tasks = [t for t in all_tasks if keyword in t["description"].lower()]
 
     # Sort logic
     if sort_method == "Priority":
         priority_order = {"High": 0, "Medium": 1, "Low": 2}
-        filtered.sort(key=lambda t: priority_order.get(t["priority"], 3))
+        visible_tasks.sort(key=lambda t: priority_order.get(t["priority"], 3))
     elif sort_method == "Due Date":
-        filtered.sort(key=lambda t: t["due_date"] or "9999-99-99")
+        visible_tasks.sort(key=lambda t: t["due_date"] or "9999-99-99")
     elif sort_method == "Completion":
-        filtered.sort(key=lambda t: t["completed"])
+        visible_tasks.sort(key=lambda t: t["completed"])
 
     task_listbox.delete(0, tk.END)
-    for i, task in enumerate(filtered):
+
+    for i, task in enumerate(visible_tasks):
         status = "✅" if task["completed"] else "❌"
         due = task["due_date"] or "None"
+
+        is_overdue = False
+        if task["due_date"]:
+            try:
+                due_date = datetime.strptime(task["due_date"], "%Y-%m-%d").date()
+                is_overdue = not task["completed"] and due_date < datetime.today().date()
+            except:
+                pass
+
         display = f"{i+1}. {task['description']} [Priority: {task['priority']}, Due: {due}] {status}"
+
+        index = task_listbox.size()
         task_listbox.insert(tk.END, display)
+
+        if task["completed"]:
+            task_listbox.itemconfig(index, fg="green")
+        elif is_overdue:
+            task_listbox.itemconfig(index, fg="red")
+        else:
+            task_listbox.itemconfig(index, fg="yellow")
+
 
 
 
@@ -58,7 +81,8 @@ def handle_delete():
         messagebox.showinfo("Info", "No task selected.")
         return
     index = selection[0]
-    delete_task(index)
+    task = visible_tasks[index]
+    toggle_task(list_tasks().index(task))
     refresh_listbox()
 
 def handle_toggle():
@@ -67,7 +91,8 @@ def handle_toggle():
         messagebox.showinfo("Info", "No task selected.")
         return
     index = selection[0]
-    toggle_task(index)
+    task = visible_tasks[index]
+    toggle_task(list_tasks().index(task))
     refresh_listbox()
 
 
