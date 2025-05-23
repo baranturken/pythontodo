@@ -19,7 +19,7 @@ A polished task management application built in Python with a tkinter-based grap
 
 - Clear all completed tasks
 
-![image](https://github.com/user-attachments/assets/76eaba61-2fd3-41e2-b6e5-10b24fb6e816)
+![image](https://github.com/user-attachments/assets/8c7372c5-f0f2-4204-85f3-a05b83057cf7)
 
 - Highlight overdue active tasks in red, completed tasks in green, upcoming active tasks in yellow
 
